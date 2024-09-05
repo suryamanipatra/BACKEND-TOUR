@@ -1,16 +1,24 @@
 import { v2 as cloudinary } from 'cloudinary';
 import fs from 'fs'
+import dotenv from "dotenv"
+
+dotenv.config()
+
 // configure cloudinary
 cloudinary.config({ 
     cloud_name: process.env.CLOUDINARY_CLOUD_NAME, 
     api_key: process.env.CLOUDINARY_API_KEY, 
-    api_secret: process.env.CLOUDINARY_API_SECRET = SVZtxKJL8KwhRR9Z2b7nfeOYCXA
-
+    api_secret: process.env.CLOUDINARY_API_SECRET
 });
 
 
 const uploadOnCloudinary = async(localFilePath) => {
     try {
+        console.log("Cloudinary config : ",{ 
+            cloud_name: process.env.CLOUDINARY_CLOUD_NAME, 
+            api_key: process.env.CLOUDINARY_API_KEY, 
+            api_secret: process.env.CLOUDINARY_API_SECRET
+        });
         if(!localFilePath) return null
         const response = await cloudinary.uploader.upload(
             localFilePath, {
@@ -22,9 +30,25 @@ const uploadOnCloudinary = async(localFilePath) => {
         fs.unlinkSync(localFilePath)
         return response
     } catch (error) {
+        console.log("Error on cloudinary",error)
         fs.unlinkSync(localFilePath)
         return null 
     }
 }
 
-export {uploadOnCloudinary}
+const deleteFromCloudinary = async (publicId) =>{
+    try {
+       const result =  await cloudinary.uploader.destroy(publicId)
+       if (result.result !== 'ok') {
+        console.log("Failed to delete from Cloudinary. Public ID:", publicId);
+        return null;
+    }
+       console.log("Deleted from coludinary. Public ID",publicId)
+       return result;
+    } catch (error) {
+        console.log("Error deleting from cloudinary:",error)
+        return null
+    }
+}
+
+export {uploadOnCloudinary,deleteFromCloudinary}

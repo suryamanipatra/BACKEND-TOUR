@@ -19,9 +19,14 @@ app.use(cookieParser())
 
 
 // import routes
-import {checkController}  from "./controllers/check.controller.js"
+import checkRouter from "./routes/check.route.js"
+import userRouter from "./routes/user.route.js"
+import { errorHandler } from "./middlewares/error.middleware.js"
 
 // routes
-app.use("/api/v1/check", checkController)
+app.use("/api/v1/check", checkRouter)
+app.use("/api/v1/users", userRouter)
 
+// this is optional middleware
+app.use(errorHandler)
 export{app}
